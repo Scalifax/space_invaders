@@ -28,8 +28,10 @@ ENEMY_INVERT_CHANCE = 0.05
 ENEMY_DRIFT_CHANCE = 0.5
 
 COLLISION_RADIUS = 10
-HIGHSCORES_FILE = "highscores.txt"
-SAVE_FILE = "savegame.txt"
+HIGHSCORES_FILE = "files/highscores.txt"
+SAVE_FILE = "files/savegame.txt"
+PLAYER_GIF = "gifs/player.gif"
+ENEMY_GIF = "gifs/enemy.gif"
 TOP_N = 10
 
 STATE = None  # usado apenas para callbacks do teclado
@@ -59,9 +61,9 @@ def carregar_estado_txt(filename):
 def criar_entidade(x,y, tipo="enemy"):
     t = turtle.Turtle(visible=False)
     if tipo == "player":
-        t.shape("player.gif")
+        t.shape(PLAYER_GIF)
     else:
-        t.shape("enemy.gif")
+        t.shape(ENEMY_GIF)
     
     print("[criar_entidade] por implementar")
 
@@ -143,7 +145,7 @@ if __name__ == "__main__":
     screen.tracer(0)
 
     # Imagens obrigatórias
-    for img in ["player.gif", "enemy.gif"]:
+    for img in [PLAYER_GIF, ENEMY_GIF]:
         if not os.path.exists(img):
             print("ERRO: imagem '" + img + "' não encontrada.")
             sys.exit(1)
