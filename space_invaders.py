@@ -58,17 +58,24 @@ def carregar_estado_txt(filename):
 # =========================
 # Criação de entidades (jogador, inimigo e balas)
 # =========================
-def criar_entidade(x,y, tipo="enemy"):
+def criar_entidade(x, y, tipo="enemy"):
     t = turtle.Turtle(visible=False)
-    if tipo == "player":
-        t.shape(PLAYER_GIF)
-    else:
-        t.shape(ENEMY_GIF)
     
-    print("[criar_entidade] por implementar")
+    match tipo:
+        case "player":
+            t.shape(PLAYER_GIF)
+        case "enemy":
+            t.shape(ENEMY_GIF)
+        case _:
+            print("Shape not specified.")
+            return None
 
+    t.penup()
+    t.goto(x, y)
+    t.pendown()
     t.showturtle()
-    return t 
+
+    return t
 
 def criar_bala(x, y, tipo):
     t = turtle.Turtle(visible=False)
@@ -88,10 +95,14 @@ def restaurar_balas(state, lista_pos, tipo):
 # Handlers de tecla 
 # =========================
 def mover_esquerda_handler():
-    print("[mover_esquerda_handler] por implementar")
+    player = STATE["player"]
+    player.setheading(180)
+    player.forward(PLAYER_SPEED)
 
 def mover_direita_handler():
-    print("[mover_direita_handler] por implementar")
+    player = STATE["player"]
+    player.setheading(0)
+    player.forward(PLAYER_SPEED)
 
 def disparar_handler():
     print("[disparar_handler] por implementar")
@@ -169,7 +180,7 @@ if __name__ == "__main__":
         print("[loaded=True] por implementar")
     else:
         print("New game!")
-        state["player"] = criar_entidade(0, -350,"player")
+        state["player"] = criar_entidade(0, -350, "player")
         spawn_inimigos_em_grelha(state, None, None)
 
     # Variavel global para os keyboard key handlers
