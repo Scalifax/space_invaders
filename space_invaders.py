@@ -450,7 +450,6 @@ def mostrar_game_over(state):
     clean_list = [state["player"]] + state["enemies"] + state["player_bullets"] + state["enemy_bullets"]
     for element in clean_list:
         element.hideturtle()
-        element.clear()
 
     # Constrói a tela de game-over
     screen = state["screen"]
@@ -469,7 +468,6 @@ def mostrar_win(state):
     clean_list = [state["player"]] + state["enemies"] + state["player_bullets"] + state["enemy_bullets"]
     for element in clean_list:
         element.hideturtle()
-        element.clear()
 
     # Constrói a tela de win
     screen = state["screen"]
