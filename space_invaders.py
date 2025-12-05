@@ -51,17 +51,17 @@ enemy_bullet_color = "red"
 # Top Resultados (Highscores)
 # =========================
 def ler_highscores(filename):
-    with open(filename, "r") as f:
-        lines = f.read().splitlines()
-
+    try:
+        with open(filename, "r") as f:
+            lines = f.read().splitlines()
+    except:
+        return []
     highscores = []
     for line in lines:
         if ":" in line:
             name, score = line.split(":", 1)
             highscores.append((name, int(score)))
-
     highscores.sort(key=lambda x: x[1], reverse=True)
-
     return highscores[:TOP_N]
 
 def atualizar_highscores(filename, score):
