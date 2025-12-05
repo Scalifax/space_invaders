@@ -37,8 +37,15 @@ HIGHSCORES_FILE = "files/highscores.txt"
 SAVE_FILE = "files/savegame.txt"
 PLAYER_IMAGE = "gifs/player.gif"
 ENEMY_IMAGE = "gifs/enemy.gif"
+FLAMENGO_IMAGE = "gifs/flamengo.gif"
+PALMEIRAS_IMAGE = "gifs/palmeiras.gif"
+GRAMA_IMAGE = "gifs/grama.gif"
 
 STATE = None  # usado apenas para callbacks do teclado
+
+# Variáveis globais que definem a cor das balas
+player_bullet_color = "yellow"
+enemy_bullet_color = "red"
 
 # =========================
 # Top Resultados (Highscores)
@@ -200,11 +207,11 @@ def criar_bala(x, y, tipo):
     match tipo:
         case "player":
             t.shape("square")
-            t.color("yellow")
+            t.color(player_bullet_color)
             t.setheading(90)
         case "enemy":
             t.shape("square")
-            t.color("red")
+            t.color(enemy_bullet_color)
             t.setheading(270)
         case _:
             print("Shape not specified.")
@@ -292,6 +299,44 @@ def terminar_handler():
         STATE["screen"].bye()
     
     atualizar_highscores(STATE["files"]["highscores"], STATE["score"])
+
+# =====================================================
+# Extra: easteregg de times brasileiros
+
+is_modo_futebol_on = False
+
+def modo_futebol_handler():
+    global player_bullet_color, enemy_bullet_color, is_modo_futebol_on
+
+    if not is_modo_futebol_on:
+        screen = STATE["screen"]
+        screen.bgpic(GRAMA_IMAGE)
+
+        player = STATE["player"]
+        player.shape(FLAMENGO_IMAGE)
+
+        enemies = STATE["enemies"]
+        for enemy in enemies:
+            enemy.shape(PALMEIRAS_IMAGE)
+
+        player_bullet_color = "red"
+        enemy_bullet_color = "white"
+        is_modo_futebol_on = True
+    else:
+        screen = STATE["screen"]
+        screen.bgpic("")
+
+        player = STATE["player"]
+        player.shape(PLAYER_IMAGE)
+
+        enemies = STATE["enemies"]
+        for enemy in enemies:
+            enemy.shape(ENEMY_IMAGE)
+
+        player_bullet_color = "yellow"
+        enemy_bullet_color = "red"
+        is_modo_futebol_on = False
+# =====================================================
 
 # =========================
 # Atualizações e colisões
@@ -398,6 +443,47 @@ def verificar_colisao_player_com_inimigos(state):
             return 1 
     return 0
 
+# =====================================================
+# Extra: Game Over and Win Screen
+def mostrar_game_over(state):
+    # Limpa os elementos existentes
+    clean_list = [state["player"]] + state["enemies"] + state["player_bullets"] + state["enemy_bullets"]
+    for element in clean_list:
+        element.hideturtle()
+        element.clear()
+
+    # Constrói a tela de game-over
+    screen = state["screen"]
+    screen.clear()
+    screen.bgcolor("black")
+
+    text = turtle.Turtle()
+    text.hideturtle()
+    text.color("red")
+    text.penup()
+    text.goto(0, 0)
+    text.write("Game-Over!!", align="center", font=("Arial", 36, "bold"))
+
+def mostrar_win(state):
+    # Limpa os elementos existentes
+    clean_list = [state["player"]] + state["enemies"] + state["player_bullets"] + state["enemy_bullets"]
+    for element in clean_list:
+        element.hideturtle()
+        element.clear()
+
+    # Constrói a tela de win
+    screen = state["screen"]
+    screen.clear()
+    screen.bgcolor("black")
+
+    text = turtle.Turtle()
+    text.hideturtle()
+    text.color("green")
+    text.penup()
+    text.goto(0, 0)
+    text.write("Win!!", align="center", font=("Arial", 36, "bold"))
+# =====================================================
+
 # =========================
 # Execução principal
 # =========================
@@ -414,7 +500,7 @@ if __name__ == "__main__":
     screen.tracer(0)
 
     # Imagens obrigatórias
-    for img in [PLAYER_IMAGE, ENEMY_IMAGE]:
+    for img in [PLAYER_IMAGE, ENEMY_IMAGE, FLAMENGO_IMAGE, PALMEIRAS_IMAGE, GRAMA_IMAGE]:
         if not os.path.exists(img):
             print("ERRO: imagem '" + img + "' não encontrada.")
             sys.exit(1)
@@ -479,6 +565,7 @@ if __name__ == "__main__":
     screen.onkeypress(disparar_handler, "space")
     screen.onkeypress(gravar_handler, "g")
     screen.onkeypress(terminar_handler, "Escape")
+    screen.onkeypress(modo_futebol_handler, "f")
 
     # Loop principal
     while True:
@@ -490,18 +577,26 @@ if __name__ == "__main__":
         
         if verificar_colisao_player_com_inimigos(STATE):
             print("Colisão direta com inimigo! Game Over")
+            mostrar_game_over(STATE)
+            time.sleep(2)
             terminar_handler()
         
         if verificar_colisoes_enemy_bullets(STATE):
             print("Atingido por inimigo! Game Over")
+            mostrar_game_over(STATE)
+            time.sleep(2)
             terminar_handler()
 
         if inimigo_chegou_ao_fundo(STATE):
             print("Um inimigo chegou ao fundo! Game Over")
+            mostrar_game_over(STATE)
+            time.sleep(2)
             terminar_handler()
 
         if len(STATE["enemies"]) == 0:
             print("Vitória! Todos os inimigos foram destruídos.")
+            mostrar_win(STATE)
+            time.sleep(2)
             terminar_handler()
 
         STATE["frame"] += 1
